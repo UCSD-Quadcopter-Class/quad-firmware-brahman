@@ -166,7 +166,6 @@ void loop() {
     
   }
 
-  /* RADIO TEST: Test sending/receiving of serial data over radio */
 
   /* If serial comes in... */
   if (Serial.available())  
