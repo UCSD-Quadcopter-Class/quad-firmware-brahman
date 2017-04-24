@@ -169,14 +169,14 @@ void loop() {
   /* RADIO TEST: Test sending/receiving of serial data over radio */
 
   /* If serial comes in... */
-  /*if (Serial.available())  
+  if (Serial.available())  
   {
     rfWrite(Serial.read()); // ...send it out the radio.
   }
   if (rfAvailable())  // If data received on radio...
   {
     Serial.print(rfRead());  // ... send it out serial.
-  }*/
+  }
 
   Serial.println("\n");
  
