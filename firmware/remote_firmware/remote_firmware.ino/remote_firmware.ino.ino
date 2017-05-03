@@ -15,6 +15,14 @@
 #include "quad_remote.h"      // Header file with pin definitions and setup
 #include <serLCD.h>
 
+const long throttleMin = 0;
+const long throttleMax = 1021;
+const long yawMin = 111;
+const long yawMax = 850;
+const long pitchMin = 75;
+const long pitchMax = 808;
+const long rollMin = 112;
+const long rollMax = 832;
 
   // Initialize global variables for storing incoming data from input pins
   int readYaw = 0;
@@ -40,10 +48,24 @@ uint8_t scale[8] =
                   B00000000};
                   
 int numbers[8] = {0,1,2,3,4,5,6,7};
+int scaledNumbers[8] = {0,1,2,3,4,5,6,7};
 char *labels[8] = {"T ", "Y ", "P ", "R ", "P1", "P2", "B1", "B2"};
 char pins[8] = {PIN_THROTTLE, PIN_YAW, PIN_PITCH, PIN_ROLL, PIN_POT1, PIN_POT2, PIN_POT1, PIN_POT2};
 
 serLCD lcd;
+
+typedef struct {
+  int magic;
+  int throttle;
+  int yaw;
+  int pitch;
+  int roll;
+  int pot1;
+  int pot2;
+} Controller;
+
+Controller control;
+
 
 void update_display() {
   lcd.clear();
@@ -79,9 +101,11 @@ void update_display() {
   }
 }
 
-void setup() {
+long runningAverage(long a, long currentMin, long currentMax, long newMin, long newMax){
+    return ((a - currentMin) * (newMax - newMin)) / (currentMax-currentMin) + newMin;
+}
 
-  //lcd.print("Hello, World!");
+void setup() {
  
   const int RADIO_CHANNEL = 11;        // Channel for radio communications (can be 11-26)
   const int SERIAL_BAUD = 9600;        // Baud rate for serial port 
@@ -99,9 +123,7 @@ void setup() {
  
   rfBegin(RADIO_CHANNEL);              // Initialize ATmega128RFA1 radio on given channel
   
-  // Send a message to other RF boards on this channel
-  //rfPrint("ATmega128RFA1 Dev Board Online!\r\n");
-  
+  // Send a message to other RF boards on this channel  
   // Set pin modes for all input pins
   pinMode(PIN_YAW, INPUT);             // Gimbal: Yaw
   pinMode(PIN_THROTTLE, INPUT);        // Gimbal: throttle
@@ -161,14 +183,24 @@ void loop() {
   update_display();
 
   for(char i= 0; i < 8;i++) {
-    Serial.print(numbers[i]);
+    int b = map(numbers[i], 111, 830, 0,255) //scaling gimbal values
+    scaledNumbers[i] = b;
+    Serial.print(b);
     Serial.print(" ");
     
   }
 
+  control.magic = 0xFFFF;
+  control.throttle = scalednumber[0]
+  control.yaw = scalednumber[1];
+  control.pitch = scalednumber[2];
+  control.roll = scalednumber[3];
+  control.pot1 = scalednumber[4];
+  control.pot2 = scalednumber[5];
+
 
   /* If serial comes in... */
-  if (Serial.available())  
+ /* if (Serial.available())  
   {
     rfWrite(Serial.read()); // ...send it out the radio.
   }
@@ -176,7 +208,8 @@ void loop() {
   {
     Serial.print(rfRead());  // ... send it out serial.
   }
-
+*/
+  rfWrite((uint8_t*) (&control), sizeof(struct Controller));
   Serial.println("\n");
  
   delay(200);
