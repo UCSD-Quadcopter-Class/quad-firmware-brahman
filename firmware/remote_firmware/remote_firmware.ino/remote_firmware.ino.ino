@@ -15,14 +15,6 @@
 #include "quad_remote.h"      // Header file with pin definitions and setup
 #include <serLCD.h>
 
-const long throttleMin = 0;
-const long throttleMax = 1021;
-const long yawMin = 111;
-const long yawMax = 850;
-const long pitchMin = 75;
-const long pitchMax = 808;
-const long rollMin = 112;
-const long rollMax = 832;
 
   // Initialize global variables for storing incoming data from input pins
   int readYaw = 0;
@@ -99,10 +91,6 @@ void update_display() {
          lcd.printCustomChar(n);
       }
   }
-}
-
-long runningAverage(long a, long currentMin, long currentMax, long newMin, long newMax){
-    return ((a - currentMin) * (newMax - newMin)) / (currentMax-currentMin) + newMin;
 }
 
 void setup() {
